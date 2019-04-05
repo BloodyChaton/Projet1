@@ -1,0 +1,25 @@
+#! /bin/bash
+
+read dbhost 0< ~/wpvardevops/dbhostfile
+read dbroot 0< ~/wpvardevops/dbrootfile
+read dbrootpw 0< ~/wpvardevops/dbrootpwfile
+read dbname 0< ~/wpvardevops/dbnamefile
+read dbuser 0< ~/wpvardevops/dbuserfile
+read dbupw 0< ~/wpvardevops/dbupwfile
+
+# installation sshpass pour 
+
+yum -y install sshpass
+
+sshpass -p "$dbrootpw" ssh -o StrictHostKeyChecking=no $dbroot@$dbhost << EOF
+
+	# Install mariadb
+	
+	yum -y install mariadb-server mariadb
+	systemctl start mariadb
+        systemctl enable mariadb	
+    	mysql -u $dbroot --password="" -e \ "create database $dbname; GRANT ALL PRIVILEGES ON $dbname.* TO '$dbuser'@'localhost' IDENTIFIED BY '$dbupw';GRANT ALL PRIVILEGES ON $dbname.* TO '$dbuser'@'%' IDENTIFIED BY '$dbupw'; UPDATE mysql.user SET Password=PASSWORD('$dbrootpw') WHERE User='$dbroot'; DELETE FROM mysql.user WHERE User='';DELETE FROM mysql.user WHERE User='$dbroot' AND Host NOT IN ('localhost', '127.0.0.1', '::1');DROP DATABASE IF EXISTS test;DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';FLUSH PRIVILEGES;"  
+EOF
+firewall-cmd --add-port=3306/tcp
+firewall-cmd --permanent --add-port=3306/tcp 
+exit
