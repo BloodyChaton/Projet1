@@ -8,11 +8,12 @@ rm dbrootpwfile
 rm dbnamefile
 rm dbuserfile
 rm dbupwfile
-if [-f wphostfile ] then
-rm wphostfile
-rm wprootfile
-rm wprootpwfile
+if [-f wphostfile ] 
+then
+  rm wphostfile
+  rm wprootfile
+  rm wprootpwfile
 fi
-cd ../wpvardevops
-rmdir ~/wpvardevops
+cd ../
+rmdir wpvardevops
 exit
